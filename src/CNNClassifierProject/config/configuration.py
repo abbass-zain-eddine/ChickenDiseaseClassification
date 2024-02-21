@@ -1,6 +1,8 @@
 from  CNNClassifierProject.constants import *
 from CNNClassifierProject.utils.common import read_yaml, create_dir
-from CNNClassifierProject.entity.config_entity import DataIngestionConfig,   PrepareBaseModelConfig
+from CNNClassifierProject.entity.config_entity import DataIngestionConfig,   PrepareBaseModelConfig, TrainingConfigs
+import os
+from pathlib import Path
 
 class ConfigurationManager:
 
@@ -34,7 +36,6 @@ class ConfigurationManager:
             updated_base_model_dir=Path(config.update_base_model_dir),
             
             params_image_size=self.params.IMAGE_SIZE,
-            params_learning_rate=self.params.LEARNING_RATE,
             params_include_top=self.params.INCLUDE_TOP,
             params_weights=self.params.WEIGHTS,
             params_classes=self.params.CLASSES,
@@ -42,4 +43,23 @@ class ConfigurationManager:
         )
         return prepare_base_model_config
     
-    
+    def get_training_configs(self)-> TrainingConfigs:
+        training=self.config.training
+        prepare_base_model= self.config.prepare_base_model
+        params= self.params
+        training_data_dir= os.path.join(self.config.data_ingestion.unzip_dir,"Train")
+        training_data_csv_dir= os.path.join(self.config.data_ingestion.unzip_dir,"training_data.csv")
+        create_dir([Path(training.root_dir)])
+
+        training_configs= TrainingConfigs(
+            root_dir=Path(training.root_dir),
+            trained_model_dir=Path(training.trained_model_dir),
+            updated_base_model_dir=Path(prepare_base_model.updated_base_model_dir),
+            training_data_dir=Path(training_data_dir),
+            training_csv_dir=Path(training_data_csv_dir),
+            params_epochs=params.EPOCHS,
+            params_batch_size=params.BATCH_SIZE,
+            param_is_augmentation=params.IS_AUGMENTATION,
+            param_image_size=params.IMAGE_SIZE
+        )
+        return training_configs

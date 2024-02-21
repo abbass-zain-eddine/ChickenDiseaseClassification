@@ -4,7 +4,7 @@ import torchvision.models as models
 
 # Example model (replace this with your own model)
 class Model(nn.Module):
-    def __init__(self, backbone, custom_layers_types, custom_layers_params, num_classes):
+    def __init__(self, backbone, custom_layers_types, custom_layers_params):
         super(Model, self).__init__()
         # Load the pre-trained backbone model
         self.backbone = backbone

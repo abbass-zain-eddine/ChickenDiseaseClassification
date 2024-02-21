@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Any
 import base64
 import boto3
-
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 @ensure_annotations
 def read_yaml(path_to_yaml:Path)->ConfigBox:
@@ -175,3 +176,15 @@ def connect_to_s3():
     aws_secret_access_key=cridentials.SECRET_KEY
     )
     return s3
+
+
+def train_val_split(path_csv,path_image,test_size=0.2):
+        
+        data_labels= pd.read_csv(path_csv)
+        data_labels=data_labels.assign(images_path=data_labels["images"].apply(lambda x:os.path.join(path_image, x)))
+        data_labels.drop(columns=["images"], inplace=True)
+        data_labels=data_labels.sample(frac=1).reset_index(drop=True)
+        data_labels=data_labels.reset_index(drop=True)
+        
+        train_images,test_images,train_labels,test_labels=train_test_split(data_labels["images_path"],data_labels["label"],test_size=test_size,stratify=data_labels["label"])
+        return train_images,test_images,train_labels,test_labels
