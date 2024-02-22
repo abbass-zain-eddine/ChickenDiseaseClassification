@@ -5,6 +5,8 @@ import os
 import glob
 import cv2
 from sklearn.model_selection import train_test_split
+from PIL import Image
+import numpy as np
 
 class CustomDataset(Dataset):
     def __init__(self,dataset,labels,transform=None):
@@ -30,8 +32,8 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, idx):
         image_path,label =self.dataset.iloc[idx],self.class_to_idx[self.labels.iloc[idx]]
-        image=cv2.imread(image_path)
-        image=cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image=Image.open(image_path)
+        image_max=np.max(np.array(image))
         if self.transform:
             image=self.transform(image)
         return image,label

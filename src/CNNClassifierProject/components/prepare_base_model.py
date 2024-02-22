@@ -31,7 +31,7 @@ class PrepareBaseModel:
         if freeze_layers:
             for layer in self.model.features.children():
                 layer.requires_grad=False        
-        self.updated_model= Model(self.model,custom_layers_types,custom_layers_params,classes)
+        self.updated_model= Model(self.model,custom_layers_types,custom_layers_params)
 
     def save_model(self):
         torch.save(self.model, self.config.base_model_dir)

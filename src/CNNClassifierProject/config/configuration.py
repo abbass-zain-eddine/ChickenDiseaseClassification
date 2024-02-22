@@ -48,18 +48,16 @@ class ConfigurationManager:
         prepare_base_model= self.config.prepare_base_model
         params= self.params
         training_data_dir= os.path.join(self.config.data_ingestion.unzip_dir,"Train")
-        training_data_csv_dir= os.path.join(self.config.data_ingestion.unzip_dir,"training_data.csv")
+        training_data_csv_dir= os.path.join(self.config.data_ingestion.unzip_dir,"train_data.csv")
         create_dir([Path(training.root_dir)])
 
         training_configs= TrainingConfigs(
             root_dir=Path(training.root_dir),
-            trained_model_dir=Path(training.trained_model_dir),
-            updated_base_model_dir=Path(prepare_base_model.updated_base_model_dir),
+            updated_base_model_dir=Path(prepare_base_model.update_base_model_dir),
             training_data_dir=Path(training_data_dir),
             training_csv_dir=Path(training_data_csv_dir),
             params_epochs=params.EPOCHS,
             params_batch_size=params.BATCH_SIZE,
-            param_is_augmentation=params.IS_AUGMENTATION,
-            param_image_size=params.IMAGE_SIZE
+            params_image_size=params.IMAGE_SIZE
         )
         return training_configs

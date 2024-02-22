@@ -1,7 +1,7 @@
 import os 
 import yaml
 from box.exceptions import BoxValueError
-from src.CNNClassifierProject.entity.logger import logging
+from CNNClassifierProject.entity.logger import logging
 import json
 import joblib
 from box import ConfigBox
@@ -52,7 +52,7 @@ def create_dir(path_to_dirs:list,verbose=True):
     """
     try:
         for path_to_dir in path_to_dirs:
-            os.makedirs(path_to_dir,exist_ok=True)
+            os.makedirs(path_to_dir,exist_ok=True,mode=777)
             if verbose:
                 logging.info(f"directory {path_to_dir} created")
     except Exception as e:
