@@ -2,7 +2,7 @@ import os
 import urllib.request as request
 import zipfile
 from CNNClassifierProject.entity.logger import logging
-from CNNClassifierProject.utils.common import get_size,connect_to_s3
+from CNNClassifierProject.utils.common import get_size,connect_to_s3, create_dir
 from CNNClassifierProject.entity.config_entity import DataIngestionConfig
 from pathlib import Path
 import requests as req
@@ -11,6 +11,7 @@ import boto3
 class DataIngestion:
     def __init__(self, config: DataIngestionConfig):
         self.config = config
+        create_dir([Path(os.path.dirname(self.config.local_data_file))])
 
     def download_data(self):
         """Download the data"""

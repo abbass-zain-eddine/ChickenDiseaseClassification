@@ -25,9 +25,7 @@ class PrepareBaseModel:
         ])
     
     def prepare_full_model(self,custom_layers_types,custom_layers_params):
-        classes= self.config.params_classes
         freeze_layers= self.config.param_freeze_layers
-        classes=self.config.params_classes
         if freeze_layers:
             for layer in self.model.features.children():
                 layer.requires_grad=False        

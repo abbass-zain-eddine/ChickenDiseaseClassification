@@ -33,7 +33,6 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         image_path,label =self.dataset.iloc[idx],self.class_to_idx[self.labels.iloc[idx]]
         image=Image.open(image_path)
-        image_max=np.max(np.array(image))
         if self.transform:
             image=self.transform(image)
         return image,label

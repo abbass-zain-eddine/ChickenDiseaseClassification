@@ -1,0 +1,54 @@
+stages: 
+  data_ingestion:
+    cmd: python src/CNNClassifierProject/pipeline/stage_01_data_ingestion.py
+    deps:
+      - src/CNNClassifierProject/pipeline/stage_01_data_ingestion.py
+      - config/config.yaml
+    outs:
+      - artifacts/data_ingestion/data
+
+  prepare_base_model:
+    cmd: python src/CNNClassifierProject/pipeline/stage_02_prepare_base_model.py
+    deps:
+      - src/CNNClassifierProject/pipeline/stage_02_prepare_base_model.py
+      - config/config.yaml
+      - src/CNNClassifierProject/config/model_head_configurations.py
+    params: #those parameter are found in params.yaml
+      - IMAGE_SIZE
+      - IMAGE_SIZE
+      - INCLUDE_TOP
+      - WEIGHTS
+      - FREEZE_LAYERS
+    outs:
+      - artifacts/prepare_base_model
+
+  training:
+    cmd: python src/CNNClassifierProject/pipeline/stage_03_training.py
+    deps:
+      - src/CNNClassifierProject/pipeline/stage_03_training.py
+      - config/config.yaml
+      - src/CNNClassifierProject/config/model_head_configurations.py
+      - artifacts/prepare_base_model
+      - artifacts/data_ingestion/data
+    params:
+      - IMAGE_SIZE
+      - BATCH_SIZE
+      - EPOCHS 
+    outs:
+      - artifacts/training/check_points
+
+  evaluation:
+    cmd: python src/CNNClassifierProject/pipeline/stage_04_evaluation.py
+    deps:
+      - src/CNNClassifierProject/pipeline/stage_04_evaluation.py 
+      - artifacts/training/check_points/best_model.pth
+      - artifacts/training/check_points/last_model.pth
+      - artifacts/data_ingestion/data
+      - config/config.yaml
+      - src/CNNClassifierProject/config/model_head_configurations.py
+    params:
+      - IMAGE_SIZE
+      - BATCH_SIZE
+    metrics:
+    - score.json:
+        cache: false

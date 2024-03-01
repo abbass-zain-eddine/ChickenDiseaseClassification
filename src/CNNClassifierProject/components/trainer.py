@@ -7,12 +7,13 @@ from CNNClassifierProject.config.model_head_configurations import (custom_layers
                                                                    learning_rate,
                                                                      nb_classes,
                                                                      check_points_dir)
-from src.CNNClassifierProject.utils.common import create_dir
+from CNNClassifierProject.utils.common import create_dir
 import torch
 from pathlib import Path
 from torch import nn
 from CNNClassifierProject.components.prepare_base_model import PrepareBaseModel
 import os
+from CNNClassifierProject.entity.logger import logging
 import time
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
@@ -24,6 +25,7 @@ class Trainer():
         self.custom_layers_params = custom_layers_params
         self.nb_classes = nb_classes
         self.classes = train_Loader.dataset.get_idx_to_class()
+        logging.info(f"Classes: {self.classes}")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.pbm=PrepareBaseModel(self.base_model_config)
         self.pbm.get_base_model()
@@ -34,10 +36,13 @@ class Trainer():
         self.optimizer = optimizer(self.model.parameters(),lr=self.learning_rate)
         self.loss_fn = loss_fn
         self.metrix = metrix
+        self.final_model_dir=self.training_config.model_dir
         self.num_epochs = self.training_config.params_epochs
         self.train_Loader = train_Loader
         self.val_loader = val_loader
-        self.TBWriter=SummaryWriter()
+        self.log_dir=os.path.join(self.training_config.root_dir,"logs_dir")
+        create_dir([self.log_dir])
+        self.TBWriter=SummaryWriter(log_dir=self.log_dir)
         
 
 
@@ -61,7 +66,6 @@ class Trainer():
             running_loss = running_loss + loss.item()
             
             predicted=torch.argmax(output,dim=1)
-            #labels=targets#torch.argmax(targets,dim=1)
             total+=targets.size(0)
             correct+=(targets == predicted).sum().item()
             
@@ -93,33 +97,25 @@ class Trainer():
                 Images = Images.to(self.device)
                 targets = targets.to(self.device)
                 output = self.model(Images)
-                #targets=torch.vstack(targets)
-                #targets=targets.transpose(0,1).float().to(self.device)
                 loss = loss_fn(output, targets)
                 running_val_loss.append(loss.item())
-                #_,predicted=torch.max(output.data,1)
-                #predicted=torch.argmax(predicted,dim=1)
                 predicted=torch.argmax(output,dim=1)
-                #labels=targets#torch.argmax(targets,dim=1)
                 totalval+=targets.size(0)
                 correctval+=(predicted == targets).sum().item()               
                 if((batch_idx-1) % 10 == 0):
                     self.TBWriter.add_images("images", Images[0], global_step=epoch*len(self.train_Loader)+batch_idx, dataformats='CHW')
-                    #TB.add_text("class", str(im_class(targets,["Speckle_Noise","Salt_Pepper","Uneven_Illumination"])), global_step=epoch*len(train_Loader)+batch_idx)
                     true_label_name=str(self.classes[targets.detach().clone()[0].item()])
                     predicted_label_name=str(self.classes[predicted.detach().clone()[0].item()])
                     label_text = f'True label: {true_label_name[0]}\nPredicted label: {predicted_label_name[0]}'
                     self.TBWriter.add_text(f'labels_{batch_idx}', label_text)
                 if (batch_idx + 1)%log_interval == 0:
                     print('val loss   @batch_idx {}/{}: {}'.format(str(batch_idx+1).zfill(len(str(len(self.val_loader)))), len(self.val_loader), loss.item()))
-        return np.array(running_val_loss).mean(),correctval,totalval,
+        return np.array(running_val_loss).mean(),correctval,totalval
     
-    def train(self,log_dir="/logs_dir",log_interval=10):
+    def train(self,log_interval=10):
 
-        self.log_dir=os.path.join(self.training_config.root_dir,log_dir)
         self.check_points_dir=os.path.join(self.training_config.root_dir,check_points_dir)
-        #create_dir([Path(self.log_dir)])
-        create_dir([Path(self.check_points_dir)])
+        create_dir([self.check_points_dir])
         
         script_time = time.time()
         train_epoch_loss = []
@@ -161,9 +157,9 @@ class Trainer():
             print('\nepoch val acc: {}'.format(float(accval)))
 
             if accval>=best_acc:
-                torch.save(self.model.state_dict(),'artifacts/training/check_points/best_model.pth')
+                torch.save(self.model.state_dict(),os.path.join(self.check_points_dir,'best_model.pth'))
                 best_acc=accval
-            torch.save(self.model.state_dict(),os.path.join(self.check_points_dir,'last_model.pth'))
+            torch.save(self.model.state_dict(),self.final_model_dir)
         total_script_time = time.time() - script_time
         m, s = divmod(total_script_time, 60)
         h, m = divmod(m, 60)

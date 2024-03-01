@@ -1,6 +1,6 @@
 from  CNNClassifierProject.constants import *
 from CNNClassifierProject.utils.common import read_yaml, create_dir
-from CNNClassifierProject.entity.config_entity import DataIngestionConfig,   PrepareBaseModelConfig, TrainingConfigs
+from CNNClassifierProject.entity.config_entity import DataIngestionConfig,   PrepareBaseModelConfig, TrainingConfigs, EvaluationConfig,PredictConfig
 import os
 from pathlib import Path
 
@@ -49,15 +49,39 @@ class ConfigurationManager:
         params= self.params
         training_data_dir= os.path.join(self.config.data_ingestion.unzip_dir,"Train")
         training_data_csv_dir= os.path.join(self.config.data_ingestion.unzip_dir,"train_data.csv")
-        create_dir([Path(training.root_dir)])
+        create_dir([training.root_dir])
 
         training_configs= TrainingConfigs(
             root_dir=Path(training.root_dir),
             updated_base_model_dir=Path(prepare_base_model.update_base_model_dir),
             training_data_dir=Path(training_data_dir),
             training_csv_dir=Path(training_data_csv_dir),
+            model_dir=Path(training.model_dir),
             params_epochs=params.EPOCHS,
             params_batch_size=params.BATCH_SIZE,
             params_image_size=params.IMAGE_SIZE
         )
         return training_configs
+
+    def get_evaluation_configs(self) -> EvaluationConfig:
+        prepare_base_model= self.config.prepare_base_model
+        eval_config= EvaluationConfig(
+            path_of_base_update_model= Path(prepare_base_model.update_base_model_dir),
+            path_of_trained_model= 'artifacts/training/check_points/best_model.pth',
+            training_data= 'artifacts/data_ingestion/data',
+            all_params= self.params,
+            params_batch_size= self.params.BATCH_SIZE,
+            params_image_size= self.params.IMAGE_SIZE
+            )
+        return eval_config
+    
+    def get_predict_config(self)->PredictConfig :
+        predict_config= PredictConfig(
+            path_to_model = self.config.prepare_base_model.update_base_model_dir,
+            path_to_weights = self.config.training.model_dir,
+            params_image_size= self.params.IMAGE_SIZE
+
+
+        )
+        return predict_config
+         

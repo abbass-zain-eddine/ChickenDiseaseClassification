@@ -27,11 +27,27 @@ class PrepareBaseModelConfig:
 @dataclass(frozen=True)
 class TrainingConfigs:
     root_dir: Path
-   # trained_model_dir: Path
+    model_dir: Path
     updated_base_model_dir: Path
     training_csv_dir: Path
     training_data_dir: Path
     params_epochs: int
     params_batch_size: int
-    #params_is_augmentation: bool
     params_image_size: list
+
+@dataclass(frozen=True)
+class EvaluationConfig:
+    path_of_base_update_model: Path
+    path_of_trained_model: Path
+    training_data: Path
+    all_params:dict
+    params_image_size: list
+    params_batch_size: int
+
+    
+@dataclass(frozen=True)
+class PredictConfig:
+    path_to_model:Path
+    path_to_weights:Path
+    params_image_size: list
+    

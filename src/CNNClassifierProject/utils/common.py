@@ -52,12 +52,15 @@ def create_dir(path_to_dirs:list,verbose=True):
     """
     try:
         for path_to_dir in path_to_dirs:
-            os.makedirs(path_to_dir,exist_ok=True,mode=777)
+            original_umask = os.umask(0)
+            os.makedirs(path_to_dir,exist_ok=True)#,mode=0o777)
             if verbose:
                 logging.info(f"directory {path_to_dir} created")
     except Exception as e:
         logging.info(e)
         raise e
+    finally:
+        os.umask(original_umask)
     
 @ensure_annotations
 def write_json(path_to_json:Path,data:dict):
@@ -155,7 +158,7 @@ def get_size(path:Path)->str:
         raise e
     
 @ensure_annotations
-def decode_base64(base64_string:str,file_name:str)->bytes:
+def decode_base64(base64_string:str,file_name:str):
     img_data = base64.b64decode(base64_string)
     with open(file_name, "wb") as f:
         f.write(img_data)
