@@ -54,7 +54,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
           AWS_ECR_LOGIN_URI: ${{secrets.AWS_ECR_LOGIN_URI}}
-          IMAGE_TAG: latest
+          IMAGE_TAG: chickenProject
         run: |
           # Build a docker container and
           # push it to ECR so that it can
@@ -87,7 +87,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
       
       
-      - name: Pull latest images
+      - name: Pull chickenProject images
         run: |
          docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
          
@@ -97,7 +97,7 @@ jobs:
        
       - name: Run Docker Image to serve users
         run: |
-         docker run -d -p 8080:8080 --ipc="host" --name=chickenProject -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+         docker run -d -p 8080:8080 --ipc="host" --name=chickenProject -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:chickenProject
       - name: Clean previous images and containers
         run: |
          docker system prune -f
