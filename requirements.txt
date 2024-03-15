@@ -1,7 +1,11 @@
+torch 
+torchvision
 pandas
 dvc
+scikit-learn
 notebook
 numpy
+boto3
 matplotlib
 seaborn
 python-box==6.0.2
@@ -13,8 +17,4 @@ types-PyYAML
 scipy
 Flask
 Flask-Cors
---index-url https://download.pytorch.org/whl/cpu
-torch
-torchvision
-torchaudio
 -e .
