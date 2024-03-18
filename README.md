@@ -1,13 +1,13 @@
 # ChickenDiseaseClassification
 
-#workflow:
+**ChangeLog**:
 
-1.Update config.yaml file
-2.Update secrets.yaml file [optional]
-3.Update params.yaml file 
-4.Update the entity
-5.Update the configuration manager in src config
-6.Update the components
-7.Update the pipline 
-8.Update the main.py file
-9.Update the dvc.yaml file
+1. Update `config.yaml` file
+1. Update `secrets.yaml` file [optional]
+1. Update `params.yaml` file 
+1. Update the entity
+1. Update the configuration manager in `src/CNNClassifierProject/config`
+1. Update the components
+1. Update the pipline 
+1. Update the `main.py` file
+1. Update the `dvc.yaml` file
